@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	ABaseGun();
 
+	// Called when the player shoots
+	void PullTrigger();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,4 +34,8 @@ private:
 	// BaseGun skeletal mesh
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* Mesh;
+
+	// Particle system for muzzle flash effect
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* MuzzleFlash;
 };

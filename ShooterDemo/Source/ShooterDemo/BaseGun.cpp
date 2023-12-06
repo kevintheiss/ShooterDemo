@@ -34,3 +34,12 @@ void ABaseGun::Tick(float DeltaTime)
 
 }
 
+void ABaseGun::PullTrigger()
+{
+	if (MuzzleFlash != nullptr)
+	{
+		// Play MuzzleFlash effect
+		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
+	}
+}
+

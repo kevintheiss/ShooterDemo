@@ -62,6 +62,8 @@ void AShooterDemoCharacter::BeginPlay()
 
 void AShooterDemoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 
@@ -92,6 +94,7 @@ void AShooterDemoCharacter::OnPrimaryAction()
 {
 	// Trigger the OnItemUsed Event
 	OnUseItem.Broadcast();
+	Gun->PullTrigger();
 }
 
 void AShooterDemoCharacter::BeginTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -161,3 +164,4 @@ bool AShooterDemoCharacter::EnableTouchscreenMovement(class UInputComponent* Pla
 	
 	return false;
 }
+
