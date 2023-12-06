@@ -7,7 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
-
+#include "BaseGun.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AShooterDemoCharacter
@@ -42,6 +42,20 @@ void AShooterDemoCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	if (GunClass != nullptr)
+	{
+		// Spawn Gun into the world
+		Gun = GetWorld()->SpawnActor<ABaseGun>(GunClass);
+
+		// Hide hand_r skeletal mesh bone
+		GetMesh()->HideBoneByName(TEXT("hand_r"), EPhysBodyOp::PBO_None);
+
+		// Attach Gun to Pistol_Socket
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("Pistol_Socket"));
+
+		// Set Gun's owner to the player
+		Gun->SetOwner(this);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////// Input

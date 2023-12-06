@@ -12,6 +12,7 @@ class USceneComponent;
 class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
+class ABaseGun;
 
 // Declaration of the delegate that will be called when the Primary Action is triggered
 // It is declared as dynamic so it can be accessed also in Blueprints
@@ -99,5 +100,13 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+private:
+	// BaseGun subclass template
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ABaseGun> GunClass;
+
+	// BaseGun pointer
+	UPROPERTY()
+	ABaseGun* Gun;
 };
 
