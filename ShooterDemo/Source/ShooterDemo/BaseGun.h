@@ -38,4 +38,24 @@ private:
 	// Particle system for muzzle flash effect
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* MuzzleFlash;
+
+	// Particle system for shot impact effect
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ImpactEffect;
+
+	// Maximum range of the gun
+	UPROPERTY(EditAnywhere)
+	float MaxRange = 1000.f;
+
+	// Return the controller pointer for the gun's owner pawn
+	AController* GetOwnerController() const;
+
+	/*
+	 * Checks the result of a line trace from the gun
+	 * 
+	 * @param	Hit  Reference to the struct containing information about one hit of the trace
+	 * @param	ShotDirection  Reference to the directional vector of the line trace
+	 * @returns true if the line trace reaches its maximum range
+	 */
+	bool GunTrace(FHitResult& Hit, FVector& ShotDirection);
 };

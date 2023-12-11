@@ -4,6 +4,7 @@
 #include "BaseGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ABaseGun::ABaseGun()
@@ -34,12 +35,85 @@ void ABaseGun::Tick(float DeltaTime)
 
 }
 
+AController* ABaseGun::GetOwnerController() const
+{
+	// Gun's owner pawn
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+
+	// Return nullptr if OwnerPawn is nullptr
+	if (OwnerPawn == nullptr)
+	{
+		return nullptr;
+	}
+
+	// Return OwnerPawn's controller
+	return OwnerPawn->GetController();
+}
+
+bool ABaseGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
+{
+	// Store result pointer of GetOwnerController
+	AController* OwnerController = GetOwnerController();
+
+	// Return false if OwnerController is nullptr
+	if (OwnerController == nullptr)
+	{
+		return false;
+	}
+
+	// Location and rotation of the line trace's origin point
+	FVector Location;
+	FRotator Rotation;
+
+	// Get the player's viewpoint at Location and Rotation
+	OwnerController->GetPlayerViewPoint(Location, Rotation);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Location: (%f, %f)"), Location.X, Location.Y);
+
+	// Set ShotDirection to the rotation vector pointing away from the origin point
+	ShotDirection = -Rotation.Vector();
+
+	// The end point vector of the line trace, which stops at MaxRange
+	FVector End = Location + (-Rotation.Vector() * MaxRange);
+
+	// Struct that defines parameters passed into line trace collision
+	FCollisionQueryParams Params;
+
+	// Ignore the BaseGun and the owning actor in the line trace
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+
+	// Return true if the line trace reaches MaxRange
+	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_Camera, Params);
+}
+
 void ABaseGun::PullTrigger()
 {
-	if (MuzzleFlash != nullptr)
+	// Store result pointer of GetOwnerController
+	AController* OwnerController = GetOwnerController();
+	// Return out of the function if MuzzleFlash is nullptr
+	if (MuzzleFlash == nullptr)
 	{
-		// Play MuzzleFlash effect
-		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
+		return;
+	}
+
+	// Play MuzzleFlash effect
+	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
+	
+	// Location and rotation of the line trace's origin point
+	FVector Location;
+	FRotator Rotation;
+
+	// Get the player's viewpoint at Location and Rotation
+	OwnerController->GetPlayerViewPoint(Location, Rotation);
+
+	FHitResult Hit;
+	FVector ShotDirection;
+	bool bSuccess = GunTrace(Hit, ShotDirection);
+
+	if (bSuccess)
+	{
+		DrawDebugPoint(GetWorld(), Location, 20, FColor::Red, true);
 	}
 }
 
