@@ -7,7 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
-
+#include "BaseGun.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AShooterDemoCharacter
@@ -42,12 +42,28 @@ void AShooterDemoCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	if (GunClass != nullptr)
+	{
+		// Spawn Gun into the world
+		Gun = GetWorld()->SpawnActor<ABaseGun>(GunClass);
+
+		// Hide hand_r skeletal mesh bone
+		GetMesh()->HideBoneByName(TEXT("hand_r"), EPhysBodyOp::PBO_None);
+
+		// Attach Gun to Pistol_Socket
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("Pistol_Socket"));
+
+		// Set Gun's owner to the player
+		Gun->SetOwner(this);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void AShooterDemoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 
@@ -78,6 +94,7 @@ void AShooterDemoCharacter::OnPrimaryAction()
 {
 	// Trigger the OnItemUsed Event
 	OnUseItem.Broadcast();
+	Gun->PullTrigger();
 }
 
 void AShooterDemoCharacter::BeginTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -147,3 +164,4 @@ bool AShooterDemoCharacter::EnableTouchscreenMovement(class UInputComponent* Pla
 	
 	return false;
 }
+
