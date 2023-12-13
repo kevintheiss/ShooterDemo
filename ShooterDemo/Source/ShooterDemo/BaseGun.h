@@ -53,8 +53,8 @@ private:
 	/*
 	 * Checks the result of a line trace from the gun
 	 * 
-	 * @param	Hit  Reference to the struct containing information about one hit of the trace
-	 * @param	ShotDirection  Reference to the directional vector of the line trace
+	 * @param	Hit  Out paramerter reference to the struct containing information about one hit of the trace
+	 * @param	ShotDirection  Out parameter reference to the directional vector of the line trace
 	 * @returns true if the line trace reaches its maximum range
 	 */
 	bool GunTrace(FHitResult& Hit, FVector& ShotDirection);

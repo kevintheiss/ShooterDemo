@@ -68,13 +68,11 @@ bool ABaseGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
 	// Get the player's viewpoint at Location and Rotation
 	OwnerController->GetPlayerViewPoint(Location, Rotation);
 
-	//UE_LOG(LogTemp, Warning, TEXT("Location: (%f, %f)"), Location.X, Location.Y);
-
 	// Set ShotDirection to the rotation vector pointing away from the origin point
 	ShotDirection = -Rotation.Vector();
 
 	// The end point vector of the line trace, which stops at MaxRange
-	FVector End = Location + (-Rotation.Vector() * MaxRange);
+	FVector End = Location + Rotation.Vector() * MaxRange;
 
 	// Struct that defines parameters passed into line trace collision
 	FCollisionQueryParams Params;
@@ -82,6 +80,8 @@ bool ABaseGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
 	// Ignore the BaseGun and the owning actor in the line trace
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
+	
+	//DrawDebugPoint(GetWorld(), End, 20, FColor::Red, true);
 
 	// Return true if the line trace reaches MaxRange
 	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_Camera, Params);
@@ -89,31 +89,32 @@ bool ABaseGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
 
 void ABaseGun::PullTrigger()
 {
-	// Store result pointer of GetOwnerController
-	AController* OwnerController = GetOwnerController();
 	// Return out of the function if MuzzleFlash is nullptr
 	if (MuzzleFlash == nullptr)
 	{
 		return;
 	}
 
-	// Play MuzzleFlash effect
+	// Play MuzzleFlash
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
-	
-	// Location and rotation of the line trace's origin point
-	FVector Location;
-	FRotator Rotation;
 
-	// Get the player's viewpoint at Location and Rotation
-	OwnerController->GetPlayerViewPoint(Location, Rotation);
-
+	// Values to be set by GunTrace out parameters
 	FHitResult Hit;
 	FVector ShotDirection;
+
+	// Store the result of GunTrace
 	bool bSuccess = GunTrace(Hit, ShotDirection);
 
 	if (bSuccess)
 	{
-		DrawDebugPoint(GetWorld(), Location, 20, FColor::Red, true);
+		// Return out of the function if ImpactEffect is nullptr
+		if (ImpactEffect == nullptr)
+		{
+			return;
+		}
+
+		// Play ImpactEffect
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());
 	}
 }
 
