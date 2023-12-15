@@ -80,8 +80,6 @@ bool ABaseGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
 	// Ignore the BaseGun and the owning actor in the line trace
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
-	
-	//DrawDebugPoint(GetWorld(), End, 20, FColor::Red, true);
 
 	// Return true if the line trace reaches MaxRange
 	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_Camera, Params);
@@ -115,6 +113,27 @@ void ABaseGun::PullTrigger()
 
 		// Play ImpactEffect
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());
+
+		// Actor hit by GunTrace
+		AActor* HitActor = Hit.GetActor();
+
+		if (HitActor != nullptr)
+		{
+			// Handle damage at the location of Hit and ShotDirection of GunTrace
+			FPointDamageEvent DamageEvent(Damage, Hit, ShotDirection, nullptr);
+
+			// Controller of the actor owning the gun
+			AController* OwnerController = GetOwnerController();
+
+			// Return out of the function if OwnerController is nullptr 
+			if (OwnerController == nullptr)
+			{
+				return;
+			}
+
+			// Call TakeDamage on HitActor
+			HitActor->TakeDamage(Damage, DamageEvent, OwnerController, this);
+		}
 	}
 }
 

@@ -100,7 +100,32 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	/*
+	 * Calculates and apply damage to a character
+	 * 
+	 * @param	DamageAmount  The amount of damage taken
+	 * @param	DamageEvent  The damage event struct out parameter to handle damage at the impact point
+	 * @param	EventInstigator  The controller of the pawn owning the gun
+	 * @param	DamageCauser  The gun causing the damage
+	 * @returns the resulting damage to apply to the character
+	 */
+	virtual float TakeDamage
+	(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
+
 private:
+	// This character's maximum health
+	UPROPERTY(EditDefaultsOnly)
+	float MaxHealth = 100.f;
+
+	// This character's current health
+	UPROPERTY(VisibleAnywhere)
+	float CurrentHealth;
+
 	// BaseGun subclass template
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ABaseGun> GunClass;

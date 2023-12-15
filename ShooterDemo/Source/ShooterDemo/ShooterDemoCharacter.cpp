@@ -165,3 +165,12 @@ bool AShooterDemoCharacter::EnableTouchscreenMovement(class UInputComponent* Pla
 	return false;
 }
 
+float AShooterDemoCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DamageToApply = FMath::Min(CurrentHealth, DamageToApply);
+	CurrentHealth -= DamageToApply;
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
+
+	return DamageToApply;
+}
